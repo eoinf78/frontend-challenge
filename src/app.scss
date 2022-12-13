@@ -1,0 +1,21 @@
+.app {
+
+  section {
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .header {
+    height: 60px;
+    background-color: var(--header-background);
+    display: flex;
+    justify-content: center;
+
+    &__logo {
+      width: 60px;
+      height: 60px;
+      margin-top: 30px;
+    }
+  }
+}
