@@ -8,6 +8,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { Tag } from '../tag/tag';
 
 export interface CharacterTableProps {
   data: any[];
@@ -16,33 +17,30 @@ export interface CharacterTableProps {
 const columnHelper = createColumnHelper<any>();
 
 const columns = [
-    columnHelper.accessor('img', {
+    columnHelper.accessor('character', {
       cell: info => (
-        <div className='table__thumbnail'>
-          <img src={info.getValue()} />
+        <div className='table__character'>
+          <label className='character-select--label' htmlFor={`char__${info.getValue().id}`}></label>
+          <input type='checkbox' id={`char__${info.getValue().id}`} />
+          <div className='table__thumbnail'>
+            <img src={info.getValue().thumbnail} />
+          </div>
+          <div>{info.getValue().name}</div>
         </div>
       ),
-      header: '',
+      header: 'Character',
     }),
     columnHelper.accessor('tags', {
       cell: info => {
         return (
-          <div>
-            {info.row.original.tags && info.row.original.tags.map((t: CharacterTag) => (
-              <span key={t.slot}>{t.tag_name}</span>
+          <div className='table__tags'>
+            {info.getValue() && info.getValue().map((t: CharacterTag) => (
+              <Tag key={`tag__${t.tag_name}`} label={t.tag_name} />
             ))}
           </div>
         )
       },
       header: 'Tags',
-    }),
-    columnHelper.accessor('name', {
-      cell: info => info.getValue(),
-      header: 'Name',
-    }),
-    columnHelper.accessor('universe', {
-      cell: info => info.getValue(),
-      header: 'Universe',
     }),
     columnHelper.accessor('mobility', {
       cell: info => (
@@ -75,7 +73,7 @@ export const CharacterTable: FC<CharacterTableProps> = ({data}) => {
     getCoreRowModel: getCoreRowModel(),
   })
   return (
-    <table>
+    <table className='table'>
       <thead>
         {table.getHeaderGroups().map(headerGroup => (
           <tr key={headerGroup.id}>

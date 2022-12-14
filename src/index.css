@@ -3,6 +3,8 @@
   --body-color: #000;
   --button-color: #0000ff;
   --red-color: #ff0000;
+  --border-grey: #cccccc;
+  --alt-table-row-color: #EDF5FF;
 }
 
 body {
@@ -12,6 +14,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #F5FDFF; 
 }
 
 code {
