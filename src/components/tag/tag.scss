@@ -1,3 +1,9 @@
+.tags {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .tag {
   display: flex;
   align-items: center;
@@ -10,4 +16,29 @@
   line-height: 1.2;
   height: 24px;
   border-radius: 24px;
+  gap: 6px;
+
+  &--label {
+    cursor: pointer;
+  }
+
+  svg {
+    display: none;
+    width: 14px;
+    height: 14px;
+  }
+
+  &__checkbox {
+    position: absolute;
+    left: -9999px;
+
+    &:checked + label {
+      background-color: var(--button-color);
+      color: #fff;
+
+      svg {
+        display: inline-block;
+      }
+    }
+  }
 }
