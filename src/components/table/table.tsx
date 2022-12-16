@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Character, CharacterTag } from '../../types';
+import { CharacterTableData, CharacterTag } from '../../types';
 import './table.scss';
 
 import {
@@ -9,22 +9,35 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { Tag } from '../tag/tag';
+import { Avatar } from '../avatar/avatar';
 
 export interface CharacterTableProps {
-  data: any[];
+  data: CharacterTableData[];
+  myChamps: CharacterTableData[];
+  onSelectCharacter: (characterId: string) => void;
 }
 
-const columnHelper = createColumnHelper<any>();
+export const CharacterTable: FC<CharacterTableProps> = ({data, myChamps, onSelectCharacter}) => {
+  const columnHelper = createColumnHelper<any>();
 
-const columns = [
+  const isSelected = (id: number) => {
+    return myChamps.find(champ => champ.character.id === id) !== undefined;
+  }
+
+  const columns = [
     columnHelper.accessor('character', {
       cell: info => (
         <div className='table__character'>
           <label className='character-select--label' htmlFor={`char__${info.getValue().id}`}></label>
-          <input type='checkbox' id={`char__${info.getValue().id}`} />
-          <div className='table__thumbnail'>
-            <img src={info.getValue().thumbnail} />
-          </div>
+          <input 
+            className='character-checkbox' 
+            type='checkbox' 
+            id={`char__${info.getValue().id}`} 
+            value={info.getValue().id} 
+            onChange={(e: any) => onSelectCharacter(e.target.value)}
+            checked={isSelected(info.getValue().id)}
+          />
+          <Avatar url={info.getValue().thumbnail} />
           <div>{info.getValue().name}</div>
         </div>
       ),
@@ -66,12 +79,12 @@ const columns = [
     })
   ]
 
-export const CharacterTable: FC<CharacterTableProps> = ({data}) => {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   })
+
   return (
     <table className='table'>
       <thead>
@@ -92,7 +105,8 @@ export const CharacterTable: FC<CharacterTableProps> = ({data}) => {
       </thead>
       <tbody>
         {table.getRowModel().rows.map(row => (
-          <tr key={row.id}>
+          <tr key={row.id} id={`characher__${row.id}`}>
+            <>{console.log(row)}</>
             {row.getVisibleCells().map(cell => (
               <td key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

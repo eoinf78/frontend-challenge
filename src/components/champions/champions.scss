@@ -1,0 +1,12 @@
+.champions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__list {
+    display: grid;
+    max-width: 500px;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 12px;
+  }
+}

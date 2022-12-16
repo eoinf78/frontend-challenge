@@ -6,8 +6,9 @@ import { CharacterTable } from './components/table/table';
 import { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import { useSearch } from './hooks/use-search';
-import {cloneDeep, uniq} from 'lodash';
+import {cloneDeep, filter, uniq} from 'lodash';
 import { Tag } from './components/tag/tag';
+import { Champions } from './components/champions/champions';
 
 const data: Character[] = jsonData as Character[];
 
@@ -20,13 +21,15 @@ function App() {
   const [pageCount, setPageCount] = useState(1);
   const [currentItems, setCurrentItems] = useState<CharacterTableData[]>([]);
   const [tagSearch, setTagSearch] = useState<string[]>([]);
+  const [myChampions, setMyChampions] = useState<CharacterTableData[]>([]);
 
   const tableData = data.map((d: Character) => {
     return {
       character: {
         id: d.id,
         name: d.name,
-        thumbnail: d.thumbnail
+        thumbnail: d.thumbnail,
+        image: d.image
       },
       tags: d.tags,
       mobility: d.abilities.find(a => a.abilityName === 'Mobility')?.abilityScore || '-',
@@ -100,6 +103,20 @@ function App() {
     }
   }
 
+  const handleCharacterCheck = (characterId: string) => {
+    const selectedCharacter = [...filteredList].find(c => c.character.id === Number(characterId));
+    if (!selectedCharacter) return;
+
+    // Check if already a champion
+    const arr = [...myChampions];
+
+    const newChamps = arr.includes(selectedCharacter) 
+      ? arr.filter((el: CharacterTableData) => el !== selectedCharacter) 
+      : myChampions.length < 5 ? [...arr, selectedCharacter] : [...arr];
+    
+    setMyChampions([...newChamps]);
+  }
+
   // Invoke when user click to request another page.
   const handlePageClick = (event: {selected: number}) => {
     const newOffset = (event.selected * CHARACTERS_PER_PAGE) % filteredList.length;
@@ -113,25 +130,28 @@ function App() {
       </header>
       <main>
         <section>
+          <Champions champions={myChampions} onRemove={(char) => console.log(char)} />
           <div className='serach'>
             <input type='text' onChange={(e) => setSearch(e.target.value)} className='serach__input' />
           </div>
           <div className='tags'>
             {availableTags.map(tag => (<Tag key={`select-tag__${tag}`} label={tag} isSelectable onSelectTag={(e) => handleTagClick(e.target.value)}/>))}
           </div>
-          <CharacterTable data={currentItems} />
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel=">"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={5}
-            pageCount={pageCount}
-            previousLabel="<"
-            containerClassName='pagination__container'
-            pageClassName='pagination__button pagination__button--number'
-            previousClassName='pagination__button pagination__button--previous'
-            nextClassName='pagination__button pagination__button--next'
-          />
+          <CharacterTable data={currentItems} myChamps={myChampions} onSelectCharacter={(id: any) => handleCharacterCheck(id)} />
+          {pageCount > 1 &&
+            <ReactPaginate
+              breakLabel="..."
+              nextLabel=">"
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={5}
+              pageCount={pageCount}
+              previousLabel="<"
+              containerClassName='pagination__container'
+              pageClassName='pagination__button pagination__button--number'
+              previousClassName='pagination__button pagination__button--previous'
+              nextClassName='pagination__button pagination__button--next'
+            />
+          }
         </section>
       </main>
     </div>

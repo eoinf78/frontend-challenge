@@ -26,6 +26,7 @@ export interface CharacterTableData {
     id: number
     name: string
     thumbnail: string
+    image: string
   }
   tags: CharacterTag[]
   mobility: number | string
