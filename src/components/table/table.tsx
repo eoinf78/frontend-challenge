@@ -28,7 +28,6 @@ export const CharacterTable: FC<CharacterTableProps> = ({data, myChamps, onSelec
     columnHelper.accessor('character', {
       cell: info => (
         <div className='table__character'>
-          <label className='character-select--label' htmlFor={`char__${info.getValue().id}`}></label>
           <input 
             className='character-checkbox' 
             type='checkbox' 
@@ -37,8 +36,10 @@ export const CharacterTable: FC<CharacterTableProps> = ({data, myChamps, onSelec
             onChange={(e: any) => onSelectCharacter(e.target.value)}
             checked={isSelected(info.getValue().id)}
           />
-          <Avatar url={info.getValue().thumbnail} />
-          <div>{info.getValue().name}</div>
+          <label className='character-select--label' htmlFor={`char__${info.getValue().id}`}>
+            <Avatar url={info.getValue().thumbnail} />
+            <span>{info.getValue().name}</span>
+          </label>
         </div>
       ),
       header: 'Character',
@@ -55,6 +56,10 @@ export const CharacterTable: FC<CharacterTableProps> = ({data, myChamps, onSelec
       },
       header: 'Tags',
     }),
+    columnHelper.accessor('power', {
+      cell: info => info.getValue(),
+      header: 'Power',
+    }),
     columnHelper.accessor('mobility', {
       cell: info => (
         <span style={{color: info.getValue() >= 10 ? '#ff0000' : '#003333'}}>{info.getValue()}</span>
@@ -68,10 +73,6 @@ export const CharacterTable: FC<CharacterTableProps> = ({data, myChamps, onSelec
     columnHelper.accessor('survivability', {
       cell: info => info.getValue(),
       header: 'Survivability',
-    }),
-    columnHelper.accessor('power', {
-      cell: info => info.getValue(),
-      header: 'Power',
     }),
     columnHelper.accessor('energy', {
       cell: info => info.getValue(),
@@ -106,7 +107,6 @@ export const CharacterTable: FC<CharacterTableProps> = ({data, myChamps, onSelec
       <tbody>
         {table.getRowModel().rows.map(row => (
           <tr key={row.id} id={`characher__${row.id}`}>
-            <>{console.log(row)}</>
             {row.getVisibleCells().map(cell => (
               <td key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

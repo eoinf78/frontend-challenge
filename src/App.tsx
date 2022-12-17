@@ -1,6 +1,6 @@
 import './app.scss'
 import jsonData from './data/characters.json'
-import type { Character, CharacterTableData, CharacterTag } from './types'
+import type { Character, CharacterTableData } from './types'
 import mainLogo from'./img/Mortal-Kombat-Logo.png';
 import { CharacterTable } from './components/table/table';
 import { useEffect, useState } from 'react';
@@ -9,10 +9,12 @@ import { useSearch } from './hooks/use-search';
 import {cloneDeep, filter, uniq} from 'lodash';
 import { Tag } from './components/tag/tag';
 import { Champions } from './components/champions/champions';
+import { CharacterSearch } from './components/search/search';
 
 const data: Character[] = jsonData as Character[];
 
-const CHARACTERS_PER_PAGE = 20;
+const CHARACTERS_PER_PAGE = 15;
+const CHAMPIONS_LIMIT = 6;
 
 function App() {
   const [filteredList, setFilteredList] = useState<CharacterTableData[]>([]);
@@ -66,14 +68,22 @@ function App() {
     } 
     
     if (tagSearch.length) {
-      clonedData = [...clonedData].filter((c: CharacterTableData) => {
-        const tagsMatch = c.tags ? c.tags.filter(element => {
-          const idx = tagSearch.indexOf(element.tag_name);
-          return idx >= 0;
-        }) : [];
+      if (tagSearch[0] !== 'myteam') {
+        clonedData = [...clonedData].filter((c: CharacterTableData) => {
+          const tagsMatch = c.tags ? c.tags.filter(element => {
+            const idx = tagSearch.indexOf(element.tag_name);
+            return idx >= 0;
+          }) : [];
 
-        return tagsMatch.length;
-      });
+          return tagsMatch.length;
+        });
+      } else {
+        // Filtering all the champions
+        clonedData = [...clonedData].filter((c: CharacterTableData) => {
+          const isChampion = myChampions.find(ch => ch.character.id === c.character.id);
+          return isChampion && c;
+        });
+      }
     }
 
     // Re-calculate pagination
@@ -88,13 +98,17 @@ function App() {
     // itemOffest updated i.e. user clicked on pagination button
     if (!filteredList.length) return;
     const endOffset = itemOffset + CHARACTERS_PER_PAGE;
-    setCurrentItems(filteredList.slice(itemOffset, endOffset));
+    const clonedList = cloneDeep(filteredList);
+    setCurrentItems([...clonedList.slice(itemOffset, endOffset)]);
     setPageCount(Math.ceil(filteredList.length / CHARACTERS_PER_PAGE));
   }, [itemOffset]);
 
   const handleTagClick = (tagname: string) => {
     const index = tagSearch.indexOf(tagname);
-    if (index >= 0) {
+
+    if (tagname === 'myteam') {
+      index < 0 ? setTagSearch(['myteam']) : setTagSearch([]);
+    } else if (index >= 0) {
       const tags = [...tagSearch];
       tags.splice(index, 1);
       setTagSearch(tags);
@@ -103,16 +117,16 @@ function App() {
     }
   }
 
-  const handleCharacterCheck = (characterId: string) => {
-    const selectedCharacter = [...filteredList].find(c => c.character.id === Number(characterId));
+  const handleCharacterCheck = (characterId: string | number) => {
+    const selectedCharacter = cloneDeep(filteredList).find(c => c.character.id === Number(characterId));
     if (!selectedCharacter) return;
 
     // Check if already a champion
     const arr = [...myChampions];
 
-    const newChamps = arr.includes(selectedCharacter) 
-      ? arr.filter((el: CharacterTableData) => el !== selectedCharacter) 
-      : myChampions.length < 5 ? [...arr, selectedCharacter] : [...arr];
+    const newChamps = arr.find(champ => champ.character.id === selectedCharacter.character.id) 
+      ? arr.filter((el: CharacterTableData) => el.character.id !== selectedCharacter.character.id) 
+      : myChampions.length < CHAMPIONS_LIMIT ? [...arr, cloneDeep(selectedCharacter)] : [...arr];
     
     setMyChampions([...newChamps]);
   }
@@ -130,14 +144,18 @@ function App() {
       </header>
       <main>
         <section>
-          <Champions champions={myChampions} onRemove={(char) => console.log(char)} />
-          <div className='serach'>
-            <input type='text' onChange={(e) => setSearch(e.target.value)} className='serach__input' />
-          </div>
+          <Champions champions={myChampions} onRemove={handleCharacterCheck} />
+          <CharacterSearch onChangeValue={setSearch} />
           <div className='tags'>
-            {availableTags.map(tag => (<Tag key={`select-tag__${tag}`} label={tag} isSelectable onSelectTag={(e) => handleTagClick(e.target.value)}/>))}
+            {availableTags.map(tag => (<Tag key={`select-tag__${tag}`} isSelected={tagSearch.includes(tag)} label={tag} isSelectable onSelectTag={(e) => handleTagClick(e.target.value)}/>))}
+            {myChampions.length > 0 && <Tag key={`select-tag__myteam`} label={'My Team'} isSelected={tagSearch.includes('myteam')} isSelectable onSelectTag={() => handleTagClick('myteam')}/>}
+            {tagSearch.length > 0 && <button className='tag__clearall' onClick={() => setTagSearch([])}>Clear all</button>}
           </div>
-          <CharacterTable data={currentItems} myChamps={myChampions} onSelectCharacter={(id: any) => handleCharacterCheck(id)} />
+          {currentItems.length > 0 ? (
+            <CharacterTable data={currentItems} myChamps={myChampions} onSelectCharacter={(id: any) => handleCharacterCheck(id)} />
+          ) : (
+            <h3>No characters match your search criteria!</h3>
+          )}
           {pageCount > 1 &&
             <ReactPaginate
               breakLabel="..."

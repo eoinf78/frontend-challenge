@@ -1,0 +1,40 @@
+.search {
+  margin: 42px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  &__container {
+    position: relative;
+
+    svg {
+      position: absolute;
+      top: 6px;
+      width: 16px;
+      height: 16px;
+      
+      &.search-icon {
+        left: 6px;
+      }
+
+      &.cross-icon {
+        cursor: pointer;
+        right: 6px;
+      }
+    }
+  }
+
+  &__input {
+    padding: 6px 6px 6px 28px;
+    border: 1px solid var(--border-grey);
+    font-size: 0.8rem;
+    line-height: 16px;
+    min-width: 220px;
+    outline: none;
+    border-radius: 4px;
+
+    &:focus {
+      border-color: var(--button-color);
+    }
+  }
+}
