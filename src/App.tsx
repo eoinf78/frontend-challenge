@@ -53,7 +53,7 @@ function App() {
   useEffect(() => {
     let clonedData = cloneDeep(tableData);
     if (search) {
-      clonedData = cloneDeep(tableData).filter((c: CharacterTableData) => {
+      clonedData = [...clonedData].filter((c: CharacterTableData) => {
         // compare tag names again search string
         const tagMatch = c.tags ? c.tags.filter(element => {
           return element.tag_name.includes(search.toLowerCase());
@@ -63,7 +63,7 @@ function App() {
         const nameMatch = c.character.name.toLowerCase().includes(search.toLowerCase());
         
         // return if name or one tag matches
-        return nameMatch || tagMatch.length;
+        return (nameMatch || tagMatch.length) && c;
       });
     } 
     
@@ -87,12 +87,11 @@ function App() {
     }
 
     // Re-calculate pagination
-    const endOffset = itemOffset + CHARACTERS_PER_PAGE;
-    setCurrentItems(clonedData.slice(itemOffset, endOffset));
+    setCurrentItems(clonedData.slice(0, CHARACTERS_PER_PAGE));
     setPageCount(Math.ceil(clonedData.length / CHARACTERS_PER_PAGE));
 
-    setFilteredList(clonedData);
-  }, [search, tagSearch]);
+    setFilteredList([...clonedData]);
+  }, [search, tagSearch, itemOffset]);
 
   useEffect(() => {
     // itemOffest updated i.e. user clicked on pagination button
