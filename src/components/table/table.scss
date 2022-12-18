@@ -42,6 +42,13 @@
       align-items: center;
     }
   }
+
+  &__ability-value {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    font-weight: 700;
+  }
 }
 
 .pagination {

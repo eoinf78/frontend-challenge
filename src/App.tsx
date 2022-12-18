@@ -52,8 +52,9 @@ function App() {
 
   useEffect(() => {
     let clonedData = cloneDeep(tableData);
+    // Text search
     if (search) {
-      clonedData = [...clonedData].filter((c: CharacterTableData) => {
+      clonedData = clonedData.filter((c: CharacterTableData) => {
         // compare tag names again search string
         const tagMatch = c.tags ? c.tags.filter(element => {
           return element.tag_name.includes(search.toLowerCase());
@@ -67,9 +68,10 @@ function App() {
       });
     } 
     
-    if (tagSearch.length) {
+    if (tagSearch.length > 0) {
+      // Filtering by the team of champions selected
       if (tagSearch[0] !== 'myteam') {
-        clonedData = [...clonedData].filter((c: CharacterTableData) => {
+        clonedData = clonedData.filter((c: CharacterTableData) => {
           const tagsMatch = c.tags ? c.tags.filter(element => {
             const idx = tagSearch.indexOf(element.tag_name);
             return idx >= 0;
@@ -79,7 +81,7 @@ function App() {
         });
       } else {
         // Filtering all the champions
-        clonedData = [...clonedData].filter((c: CharacterTableData) => {
+        clonedData = clonedData.filter((c: CharacterTableData) => {
           const isChampion = myChampions.find(ch => ch.character.id === c.character.id);
           return isChampion && c;
         });

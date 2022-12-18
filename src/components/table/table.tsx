@@ -57,25 +57,33 @@ export const CharacterTable: FC<CharacterTableProps> = ({data, myChamps, onSelec
       header: 'Tags',
     }),
     columnHelper.accessor('power', {
-      cell: info => info.getValue(),
+      cell: info => (
+        <span className='table__ability-value' style={{color: info.getValue() >= 10 ? '#ff0000' : '#003333'}}>{info.getValue()}</span>
+      ),
       header: 'Power',
     }),
     columnHelper.accessor('mobility', {
       cell: info => (
-        <span style={{color: info.getValue() >= 10 ? '#ff0000' : '#003333'}}>{info.getValue()}</span>
+        <span className='table__ability-value' style={{color: info.getValue() >= 10 ? '#ff0000' : '#003333'}}>{info.getValue()}</span>
       ),
       header: 'Mobility',
     }),
     columnHelper.accessor('technique', {
-      cell: info => info.getValue(),
+      cell: info => (
+        <span className='table__ability-value' style={{color: info.getValue() >= 10 ? '#ff0000' : '#003333'}}>{info.getValue()}</span>
+      ),
       header: 'Technique',
     }),
     columnHelper.accessor('survivability', {
-      cell: info => info.getValue(),
+      cell: info => (
+        <span className='table__ability-value' style={{color: info.getValue() >= 10 ? '#ff0000' : '#003333'}}>{info.getValue()}</span>
+      ),
       header: 'Survivability',
     }),
     columnHelper.accessor('energy', {
-      cell: info => info.getValue(),
+      cell: info => (
+        <span className='table__ability-value' style={{ color: info.getValue() >= 10 ? '#ff0000' : '#003333'}}>{info.getValue()}</span>
+      ),
       header: 'Energy',
     })
   ]
